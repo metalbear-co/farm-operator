@@ -1,14 +1,28 @@
+#![feature(once_cell)]
+
 use std::net::SocketAddr;
 
 use axum::{response::IntoResponse, routing::get, Json, Router};
 use axum_server::tls_rustls::RustlsConfig;
-use k8s_openapi::apimachinery::pkg::apis::meta::v1::APIResourceList;
+use k8s_openapi::apimachinery::pkg::apis::meta::v1::{APIResource, APIResourceList};
+use kube::Resource as _;
 use tower_http::trace::TraceLayer;
+
+use crate::resources::lama;
+
+mod resources;
 
 async fn get_api_resources() -> impl IntoResponse {
     Json(APIResourceList {
         group_version: "farm.example.com/v1alpha".to_owned(),
-        resources: vec![],
+        resources: vec![APIResource {
+            group: Some(lama::Lama::group(&()).into()),
+            kind: lama::Lama::kind(&()).into(),
+            name: lama::Lama::plural(&()).into(),
+            namespaced: true,
+            verbs: vec!["list".to_owned(), "pet".to_owned()],
+            ..Default::default()
+        }],
     })
 }
 
@@ -18,6 +32,14 @@ async fn main() -> anyhow::Result<()> {
 
     let app = Router::new()
         .route("/apis/farm.example.com/v1alpha", get(get_api_resources))
+        .route(
+            "/apis/farm.example.com/v1alpha/namespaces/:namespace/lamas",
+            get(lama::list_lamas),
+        )
+        .route(
+            "/apis/farm.example.com/v1alpha/namespaces/:namespace/lamas/:name",
+            get(lama::get_lama),
+        )
         .layer(TraceLayer::new_for_http());
 
     let cert = rcgen::generate_simple_self_signed(vec!["localhost".to_owned()])?;
@@ -28,7 +50,6 @@ async fn main() -> anyhow::Result<()> {
         cert.serialize_private_key_der(),
     )
     .await?;
-
     println!("listening on {addr}");
 
     axum_server::bind_rustls(addr, config)
