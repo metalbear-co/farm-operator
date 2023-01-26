@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: farm-operator
+  name: farm-operator
+spec:
+  selector:
+    matchLabels:
+      app: farm-operator
+  template:
+    metadata:
+      labels:
+        app: farm-operator
+    spec:
+      containers:
+        - image: farm-operator
+          imagePullPolicy: IfNotPresent
+          name: farm-operator
+          ports:
+          - containerPort: 3000
+            name: https
+            protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: farm-operator
+  name: farm-operator
+spec:
+  ports:
+  - name: https
+    port: 3000
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: farm-operator
+  type: ClusterIP
+---
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1alpha.farm.example.com
+spec:
+  group: farm.example.com
+  groupPriorityMinimum: 1000
+  insecureSkipTLSVerify: true
+  service:
+    name: farm-operator
+    namespace: default
+    port: 3000
+  version: v1alpha
+  versionPriority: 15
