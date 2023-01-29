@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::LazyLock};
 
 use axum::{
     extract::Path,
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
@@ -45,7 +45,9 @@ pub struct LamaSpec {
     pub height: f32,
 }
 
-pub async fn list_lamas(Path(namespace): Path<String>) -> impl IntoResponse {
+pub async fn list_lamas(Path(namespace): Path<String>, headers: HeaderMap) -> impl IntoResponse {
+    println!("{headers:#?}");
+
     Json(serde_json::json!({
         "apiVersion": "farm.example.com/v1alpha",
         "kind": "LamaList",
