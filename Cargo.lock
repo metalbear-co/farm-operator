@@ -307,6 +307,7 @@ name = "farm-operator"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "axum",
  "axum-server",
  "base64 0.21.0",
@@ -318,6 +319,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "tower",
  "tower-http",
  "tracing-subscriber",
 ]

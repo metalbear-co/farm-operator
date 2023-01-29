@@ -8,21 +8,31 @@ use k8s_openapi::apimachinery::pkg::apis::meta::v1::{APIResource, APIResourceLis
 use kube::Resource as _;
 use tower_http::trace::TraceLayer;
 
-use crate::resources::lama;
+use crate::resources::{farmpod, lama};
 
+mod impersonation;
 mod resources;
 
 async fn get_api_resources() -> impl IntoResponse {
     Json(APIResourceList {
         group_version: "farm.example.com/v1alpha".to_owned(),
-        resources: vec![APIResource {
-            group: Some(lama::Lama::group(&()).into()),
-            kind: lama::Lama::kind(&()).into(),
-            name: lama::Lama::plural(&()).into(),
-            namespaced: true,
-            verbs: vec!["list".to_owned(), "pet".to_owned()],
-            ..Default::default()
-        }],
+        resources: vec![
+            APIResource {
+                group: Some(lama::Lama::group(&()).into()),
+                kind: lama::Lama::kind(&()).into(),
+                name: lama::Lama::plural(&()).into(),
+                namespaced: true,
+                verbs: vec!["list".to_owned(), "get".to_owned()],
+                ..Default::default()
+            },
+            APIResource {
+                kind: "FarmPod".to_owned(),
+                name: "farmpods".to_owned(),
+                namespaced: true,
+                verbs: vec!["list".to_owned(), "get".to_owned()],
+                ..Default::default()
+            },
+        ],
     })
 }
 
@@ -39,6 +49,10 @@ async fn main() -> anyhow::Result<()> {
         .route(
             "/apis/farm.example.com/v1alpha/namespaces/:namespace/lamas/:name",
             get(lama::get_lama),
+        )
+        .route(
+            "/apis/farm.example.com/v1alpha/namespaces/:namespace/farmpods",
+            get(farmpod::list_farmpods),
         )
         .layer(TraceLayer::new_for_http());
 
