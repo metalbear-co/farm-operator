@@ -12,9 +12,9 @@ use kube::CustomResource;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-type Lamas = HashMap<String, HashMap<String, Lama>>;
+type Llamas = HashMap<String, HashMap<String, Llama>>;
 
-static STATIC_LAMAS: LazyLock<Lamas> = LazyLock::new(|| {
+static STATIC_LLAMAS: LazyLock<Llamas> = LazyLock::new(|| {
     serde_json::from_value(serde_json::json!({
         "default": {
             "dolly": {
@@ -37,27 +37,27 @@ static STATIC_LAMAS: LazyLock<Lamas> = LazyLock::new(|| {
 #[kube(
     group = "farm.example.com",
     version = "v1alpha",
-    kind = "Lama",
+    kind = "Llama",
     namespaced
 )]
-pub struct LamaSpec {
+pub struct LlamaSpec {
     pub weight: f32,
     pub height: f32,
 }
 
-pub async fn list_lamas(Path(namespace): Path<String>, headers: HeaderMap) -> impl IntoResponse {
+pub async fn list_llamas(Path(namespace): Path<String>, headers: HeaderMap) -> impl IntoResponse {
     println!("{headers:#?}");
 
     Json(serde_json::json!({
         "apiVersion": "farm.example.com/v1alpha",
         "kind": "LamaList",
-        "items": &STATIC_LAMAS.get(&namespace).map(|lamas| lamas.values().collect::<Vec<_>>()).unwrap_or_default(),
+        "items": &STATIC_LLAMAS.get(&namespace).map(|lamas| lamas.values().collect::<Vec<_>>()).unwrap_or_default(),
         "metadata": ListMeta::default()
     }))
 }
 
-pub async fn get_lama(Path((namespace, name)): Path<(String, String)>) -> Response {
-    if let Some(lama) = STATIC_LAMAS
+pub async fn get_llama(Path((namespace, name)): Path<(String, String)>) -> Response {
+    if let Some(lama) = STATIC_LLAMAS
         .get(&namespace)
         .and_then(|lamas| lamas.get(&name))
     {
