@@ -161,7 +161,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "farm-operator"
+name = "farm-operator-1"
 version = "0.1.0"
 dependencies = [
  "anyhow",
