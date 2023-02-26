@@ -5,7 +5,9 @@ WORKDIR /build
 
 COPY ./platform.sh ./rust-toolchain.toml .
 
+RUN chmod +x ./platform.sh
 RUN ./platform.sh
+
 RUN rustup component add --toolchain nightly rustfmt
 RUN rustup target add --toolchain nightly $(cat /.platform)
 RUN apt-get update && apt-get install -y $(cat /.compiler)
