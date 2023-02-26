@@ -15,7 +15,7 @@ jobs:
   build-and-publish:
     strategy:
       matrix:
-        step: ['1', '2']
+        step: ['step-1', 'step-2']
     runs-on: ubuntu-latest
     steps:
       -
@@ -39,8 +39,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./step-{{ matrix.step }}/Dockerfile
+          file: ./${{ matrix.step }}/Dockerfile
           push: true
           build-args: |
             GITHUB_SHA=${{ github.sha }}
-          tags: ghcr.io/metalbear-co/farm-operator:{{ matrix.step }}-latest
+          tags: ghcr.io/metalbear-co/farm-operator:${{ matrix.step }}
