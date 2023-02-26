@@ -1,4 +1,4 @@
-FROM FROM --platform=$BUILDPLATFORM instrumentisto/rust:nightly as builder
+FROM --platform=$BUILDPLATFORM instrumentisto/rust:nightly as builder
 ARG TARGETARCH
 
 WORKDIR /build
