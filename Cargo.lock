@@ -338,6 +338,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "farm-operator-3"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "axum-server",
+ "base64 0.21.0",
+ "chrono",
+ "k8s-openapi",
+ "kube",
+ "rcgen",
+ "schemars",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
