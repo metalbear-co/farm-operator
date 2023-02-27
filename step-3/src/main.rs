@@ -10,7 +10,6 @@ use tower_http::trace::TraceLayer;
 
 use crate::resources::{farmpod, llama};
 
-mod impersonation;
 mod resources;
 
 async fn get_api_resources() -> impl IntoResponse {
@@ -22,14 +21,15 @@ async fn get_api_resources() -> impl IntoResponse {
                 kind: llama::Llama::kind(&()).into(),
                 name: llama::Llama::plural(&()).into(),
                 namespaced: true,
-                verbs: vec!["list".to_owned(), "pet".to_owned()],
+                verbs: vec!["list".to_owned(), "get".to_owned()],
                 ..Default::default()
             },
             APIResource {
-                kind: "FarmPod".to_owned(),
-                name: "farmpods".to_owned(),
+                group: Some(farmpod::FarmPod::group(&()).into()),
+                kind: farmpod::FarmPod::kind(&()).into(),
+                name: farmpod::FarmPod::plural(&()).into(),
                 namespaced: true,
-                verbs: vec!["list".to_owned(), "get".to_owned()],
+                verbs: vec!["list".to_owned()],
                 ..Default::default()
             },
         ],

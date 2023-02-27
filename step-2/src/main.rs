@@ -20,7 +20,7 @@ async fn get_api_resources() -> impl IntoResponse {
             kind: llama::Llama::kind(&()).into(),
             name: llama::Llama::plural(&()).into(),
             namespaced: true,
-            verbs: vec!["list".to_owned(), "pet".to_owned()],
+            verbs: vec!["list".to_owned(), "get".to_owned()],
             ..Default::default()
         }],
     })

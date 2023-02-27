@@ -1,14 +1,22 @@
 use axum::{extract::Path, response::IntoResponse, Json};
 use k8s_openapi::api::core::v1::Pod;
-use kube::Api;
+use kube::{Api, Client, CustomResource};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
-use crate::impersonation::ImpersonationLayer;
+#[derive(CustomResource, Clone, Debug, Deserialize, Serialize, JsonSchema)]
+#[kube(
+    group = "farm.example.com",
+    version = "v1alpha",
+    kind = "FarmPod",
+    namespaced
+)]
+pub struct FarmPodSpec {
+    pub containers: usize,
+}
 
-pub async fn list_farmpods(
-    Path(namespace): Path<String>,
-    impersonation: ImpersonationLayer,
-) -> impl IntoResponse {
-    let client = impersonation.client().await.expect("Client Creation Error");
+pub async fn list_farmpods(Path(namespace): Path<String>) -> impl IntoResponse {
+    let client = Client::try_default().await.expect("Client Creation Error");
 
     let pods = Api::<Pod>::namespaced(client, &namespace)
         .list(&Default::default())
@@ -18,9 +26,22 @@ pub async fn list_farmpods(
     let items = pods
         .items
         .into_iter()
-        .map(|mut value| {
-            value.metadata.name = value.metadata.name.map(|name| format!("farm-{name}"));
-            value
+        .map(|value| {
+            let name = value
+                .metadata
+                .name
+                .map(|name| format!("farm-{name}"))
+                .unwrap_or_default();
+
+            FarmPod::new(
+                &name,
+                FarmPodSpec {
+                    containers: value
+                        .spec
+                        .map(|spec| spec.containers.len())
+                        .unwrap_or_default(),
+                },
+            )
         })
         .collect::<Vec<_>>();
 
