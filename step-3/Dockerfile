@@ -3,6 +3,10 @@ ARG TARGETARCH
 
 WORKDIR /build
 
+RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py
+RUN python3 -m pip install ziglang
+RUN cargo install cargo-zigbuild
+
 COPY ./platform.sh ./rust-toolchain.toml .
 
 RUN chmod +x ./platform.sh
@@ -14,7 +18,7 @@ RUN apt-get update && apt-get install -y $(cat /.compiler)
 
 COPY . .
 
-RUN cargo +nightly build -p farm-operator-3 --target $(cat /.platform) --release --locked
+RUN cargo +nightly zigbuild -p farm-operator-3 --target $(cat /.platform) --release --locked
 
 RUN cp /build/target/$(cat /.platform)/release/farm-operator-3 /farm-operator-3
 
