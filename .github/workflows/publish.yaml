@@ -42,6 +42,8 @@ jobs:
           file: ./${{ matrix.step }}/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64,linux/arm/v7
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             GITHUB_SHA=${{ github.sha }}
           tags: ghcr.io/metalbear-co/farm-operator:${{ matrix.step }}
