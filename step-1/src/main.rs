@@ -15,6 +15,8 @@ async fn get_api_resources() -> impl IntoResponse {
 async fn main() -> anyhow::Result<()> {
     let app = Router::new().route("/apis/farm.example.com/v1alpha", get(get_api_resources));
 
+    // We generate a self-signed certificate for example purposes in a proper service this should be
+    // loaded from secret and CA for said cert should be defined in APIService uner `caBundle`
     let tls_cert = rcgen::generate_simple_self_signed(vec!["localhost".to_owned()])?;
     let tls_config = RustlsConfig::from_der(
         vec![tls_cert.serialize_der()?],

@@ -12,9 +12,11 @@ use kube::CustomResource;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-type Llamas = HashMap<String, HashMap<String, Llama>>;
-
-static STATIC_LLAMAS: LazyLock<Llamas> = LazyLock::new(|| {
+/// For example this contains a nested hashmap containing llamas, this could be an external database
+/// or any other source of data for the creation of Llama objects
+///
+/// Structrue of the nesting is `{ [namespace]: { [name]: Llama  } }`
+static STATIC_LLAMAS: LazyLock<HashMap<String, HashMap<String, Llama>>> = LazyLock::new(|| {
     serde_json::from_value(serde_json::json!({
         "default": {
             "dolly": {
