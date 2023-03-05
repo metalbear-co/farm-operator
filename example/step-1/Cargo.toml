@@ -1,5 +1,5 @@
 [package]
-name = "farm-operator"
+name = "farm-operator-1"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,8 +10,3 @@ axum-server = { version = "0.4", features = ["tls-rustls"] }
 k8s-openapi = { version = "0.17", features = ["v1_24"] }
 rcgen = "0.10"
 tokio = { version = "1", features = ["full"] }
-
-[workspace]
-members = [
-	"example/*"
-]

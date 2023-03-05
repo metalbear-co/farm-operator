@@ -15,7 +15,7 @@ spec:
         app: farm-operator
     spec:
       containers:
-        - image: farm-operator
+        - image: ghcr.io/metalbear-co/farm-operator:step-1
           imagePullPolicy: IfNotPresent
           name: farm-operator
           ports:

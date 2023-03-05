@@ -18,17 +18,17 @@ RUN apt-get update && apt-get install -y $(cat /.compiler)
 
 COPY . .
 
-RUN cargo +nightly zigbuild -p farm-operator --target $(cat /.platform) --release --locked
+RUN cargo +nightly zigbuild -p farm-operator-3 --target $(cat /.platform) --release --locked
 
-RUN cp /build/target/$(cat /.platform)/release/farm-operator /farm-operator
+RUN cp /build/target/$(cat /.platform)/release/farm-operator-3 /farm-operator-3
 
 FROM debian:stable
 
 RUN apt-get update && apt-get install ca-certificates -y
 
-COPY --from=builder /farm-operator /
+COPY --from=builder /farm-operator-3 /
 
-ENTRYPOINT ["/farm-operator"]
+ENTRYPOINT ["/farm-operator-3"]
 
 ARG GITHUB_SHA
 LABEL org.opencontainers.image.source="https://github.com/metalbear-co/farm-operator/tree/${GITHUB_SHA:-main}/"

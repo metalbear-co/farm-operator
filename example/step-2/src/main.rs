@@ -1,19 +1,42 @@
+#![feature(once_cell)]
+
 use std::net::SocketAddr;
 
 use axum::{response::IntoResponse, routing::get, Json, Router};
 use axum_server::tls_rustls::RustlsConfig;
-use k8s_openapi::apimachinery::pkg::apis::meta::v1::APIResourceList;
+use k8s_openapi::apimachinery::pkg::apis::meta::v1::{APIResource, APIResourceList};
+use kube::Resource as _;
+
+use crate::resources::llama;
+
+mod resources;
 
 async fn get_api_resources() -> impl IntoResponse {
     Json(APIResourceList {
         group_version: "farm.example.com/v1alpha".to_string(),
-        resources: vec![],
+        resources: vec![APIResource {
+            group: Some(llama::Llama::group(&()).into()),
+            kind: llama::Llama::kind(&()).into(),
+            name: llama::Llama::plural(&()).into(),
+            namespaced: true,
+            verbs: vec!["list".to_string(), "get".to_string()],
+            ..Default::default()
+        }],
     })
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let app = Router::new().route("/apis/farm.example.com/v1alpha", get(get_api_resources));
+    let app = Router::new()
+        .route("/apis/farm.example.com/v1alpha", get(get_api_resources))
+        .route(
+            "/apis/farm.example.com/v1alpha/namespaces/:namespace/llamas",
+            get(llama::list_llamas),
+        )
+        .route(
+            "/apis/farm.example.com/v1alpha/namespaces/:namespace/llamas/:name",
+            get(llama::get_llama),
+        );
 
     // We generate a self-signed certificate for example purposes in a proper service this should be
     // loaded from secret and CA for said cert should be defined in APIService uner `caBundle`
