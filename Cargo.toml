@@ -13,5 +13,5 @@ tokio = { version = "1", features = ["full"] }
 
 [workspace]
 members = [
-	"example/step-*"
+	"example/*"
 ]
