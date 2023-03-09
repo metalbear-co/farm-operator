@@ -14,6 +14,7 @@ spec:
       labels:
         app: farm-operator
     spec:
+      serviceAccountName: farm-operator
       containers:
         - image: ghcr.io/metalbear-co/farm-operator:step-1
           imagePullPolicy: IfNotPresent
@@ -53,3 +54,38 @@ spec:
     port: 3000
   version: v1alpha
   versionPriority: 15
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: farm-operator
+  labels:
+    app: farm-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: farm-operator
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: farm-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: farm-operator
+subjects:
+- apiGroup: ''
+  kind: ServiceAccount
+  name: farm-operator
+  namespace: default
