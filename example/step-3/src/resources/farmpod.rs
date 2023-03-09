@@ -21,7 +21,7 @@ pub async fn list_farmpods(Path(namespace): Path<String>) -> impl IntoResponse {
     let pods = Api::<Pod>::namespaced(client, &namespace)
         .list(&Default::default())
         .await
-        .expect("Falied to fetch pods");
+        .expect("Failed to fetch pods");
 
     let items = pods
         .items
