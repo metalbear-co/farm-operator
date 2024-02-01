@@ -2,7 +2,7 @@
 
 Example operator for Kubernetes in Rust.
 
-[Tutorial.](https://metalbear.co/blog/writing-a-kubernetes-operator/controller/)
+[Tutorial.](https://metalbear.co/blog/writing-a-kubernetes-operator/)
 
 This repo contians 3 examples and a copy of example 1 in `./src`.
 
